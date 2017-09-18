@@ -2,7 +2,7 @@
  * acquisition - RedPitaya Data Acquisition
  *
  *
- * Copyright (C) 2016 Moritz Kütt, Malte Göttsche, Alexander Glaser
+ * Copyright (C) 2016, 2017 Moritz Kütt, Malte Göttsche, Alexander Glaser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

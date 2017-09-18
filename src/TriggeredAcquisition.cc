@@ -2,7 +2,7 @@
  * acquisition - RedPitaya Data Acquisition
  *
  *
- * Copyright (C) 2016 Moritz Kütt, Malte Göttsche, Alexander Glaser
+ * Copyright (C) 2016, 2017 Moritz Kütt, Malte Göttsche, Alexander Glaser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ TriggeredAcquisition::TriggeredAcquisition() {
     peakpos[i] = 0;
   }
 
-  ratiomin = 90;
-  ratiomax = 110;
-  channelstart = -1;
-  channelend = -1;
+  ratiomin = 0;
+  ratiomax = 1e6;
+  channelstart = 0;
+  channelend = 8192;
   curvebend = 0;
 
   datam = (int*) malloc(BUF * sizeof(int));
@@ -105,10 +105,10 @@ void TriggeredAcquisition::Measure(float length, MeasurementLengthType mlt) {
     std::cout << "Measure, store in binary file, write every data point separately" << std::endl;
   }
   else if(writeoff == WRITE_OFF_ASCII_INTEGRAL) {
-    std::cout << "Measure, store in ascii file, write integral over peak, baseline substracted, simple double rejection" << std::endl;
+    std::cout << "Measure, store in ascii file, write integral over peak, baseline substracted, simple double peak rejection" << std::endl;
   }
   else if(writeoff == WRITE_OFF_JUST_CHECK) {
-    std::cout << "Measure, no storage, just calculation of some values." << std::endl;
+    std::cout << "Measure, no storage, just calculation of values useful for adjusting settings." << std::endl;
   }
 
   // Set 'Trigger delay', number of data points to be acquired after trigger
@@ -163,7 +163,7 @@ void TriggeredAcquisition::Measure(float length, MeasurementLengthType mlt) {
     fprintf(fh, "Decimation:           %d\n", decimation);
     fprintf(fh, "Trace length:         %d\n", tracelength);
     fprintf(fh, "Pretrigger length:    %d\n", pretriggerlength);
-    fprintf(fh, "Trigger Voltage:      %f\n", triggervoltage);
+    fprintf(fh, "Trigger Value:        %f\n", triggervalue);
     fprintf(fh, "Triggering on:        %s\n", triggers.c_str());
   }
   else if (writeoff == WRITE_OFF_ASCII_INTEGRAL){
@@ -177,8 +177,12 @@ void TriggeredAcquisition::Measure(float length, MeasurementLengthType mlt) {
     fprintf(fh, "Decimation:           %d\n", decimation);
     fprintf(fh, "Trace length:         %d\n", tracelength);
     fprintf(fh, "Pretrigger length:    %d\n", pretriggerlength);
-    fprintf(fh, "Trigger Voltage:      %f\n", triggervoltage);
+    fprintf(fh, "Trigger Value:        %f\n", triggervalue);
     fprintf(fh, "Triggering on:        %s\n", triggers.c_str());
+    fprintf(fh, "Rej. Param. <min>     %f\n", ratiomin);
+    fprintf(fh, "Rej. Param. <max>     %f\n", ratiomax);
+    fprintf(fh, "Rej. Param. <s>       %d\n", channelstart);
+    fprintf(fh, "Rej. Param. <e>       %d\n", channelend);
   }
 
   if(verboseLevel > 0) {
@@ -253,7 +257,9 @@ void TriggeredAcquisition::Measure(float length, MeasurementLengthType mlt) {
   }
   clkDuration = std::chrono::duration_cast<millisec_t>(std::chrono::high_resolution_clock::now() - starttime);
   std::cout << "Sampled " << runcount << " traces in " << clkDuration.count()  << "ms (" << runcount / clkDuration.count() * 1000 << " traces/s)."<< std::endl;
-  std::cout << "Discarded " << discarded << " traces because of rejection conditions" << std::endl;
+  if (writeoff == WRITE_OFF_ASCII_INTEGRAL) { 
+    std::cout << "Discarded " << discarded << " traces because of rejection conditions" << std::endl;
+  }
   //    intfile.close();
   if(writeoff == WRITE_OFF_JUST_CHECK) {
     int peak1 = 0;
@@ -639,13 +645,21 @@ void TriggeredAcquisition::SetFilename(std::string filen) {
 
 
 void TriggeredAcquisition::DumpSettings() {
+  std::cout << std::endl;
   std::cout << "*** Sampling Settings" << std::endl;
-  std::cout << "Decimation:           " << decimation << std::endl;
-  std::cout << "Trace length:         " << tracelength << std::endl;
-  std::cout << "Pretrigger length:    " << pretriggerlength << std::endl;
+  std::cout << "Decimation:               " << decimation << std::endl;
+  std::cout << "Trace length:             " << tracelength << std::endl;
+  std::cout << "Pretrigger length:        " << pretriggerlength << std::endl;
   //std::cout << "Trigger Voltage:      " << triggervoltage << " Volt" << std::endl;
-  std::cout << "Trigger Value:        " << triggervalue << std::endl; 
-  std::cout << "Triggering on:        " << triggerString(trigger) << std::endl;
+  std::cout << "Trigger Value:            " << triggervalue << std::endl; 
+  std::cout << "Triggering on:            " << triggerString(trigger) << std::endl;
+  if (writeoff == WRITE_OFF_ASCII_INTEGRAL) { 
+    std::cout << "Rejection Parameter <min> " << ratiomin << std::endl;
+    std::cout << "Rejection Parameter <max> " << ratiomax << std::endl;
+    std::cout << "Rejection Parameter <s>   " << channelstart << std::endl;
+    std::cout << "Rejection Parameter <e>   " << channelend << std::endl;
+  }
+  std::cout << std::endl;
 }
 
 std::string TriggeredAcquisition::triggerString(TriggerSetting ts) {

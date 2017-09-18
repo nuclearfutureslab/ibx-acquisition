@@ -2,7 +2,7 @@
  * acquisition - RedPitaya Data Acquisition
  *
  *
- * Copyright (C) 2016 Moritz Kütt, Malte Göttsche, Alexander Glaser
+ * Copyright (C) 2016, 2017 Moritz Kütt, Malte Göttsche, Alexander Glaser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,24 +32,23 @@ void usage() {
       std::cout << std::endl;
       std::cout << "<measurementlength> is the length of measurement." << std::endl;
       std::cout << "Per default, the length is time measured in seconds, but" << std::endl;
-      std::cout << "it can be changed to number of traces by adding the option '-n'" << std::endl;
+      std::cout << "it can be alternatively interpreted as a number of traces" << std::endl;
+      std::cout << "when option '-n' is specified" << std::endl;
       std::cout << std::endl;
       std::cout << "Options:" << std::endl;
       std::cout << "   -n                     take <measurementlength> to be number of measured traces" << std::endl;
       std::cout << "   -f <filename>          measured traces will be stored in <filename>";
-      //    std::cout << "   " << std::endl;
-      // here add optimization flags
       std::cout << std::endl;
       std::cout << "   -d <decimation>        set decimation" << std::endl;
       std::cout << "   -t <triggermethod>     set triggering method, details below" << std::endl;
-      std::cout << "   -u <triggervoltage>    set triggervoltage" << std::endl;
-      std::cout << "   -v <triggervalue>    set trigger value (-8192 to 8191)" << std::endl;
-      std::cout << "   -p <pretriggerlength>  set length of data recorded pre-trigger" << std::endl;
+      std::cout << "   -u <triggervoltage>    set trigger (voltage)" << std::endl;
+      std::cout << "   -v <triggervalue>      set trigger (channel, -8192 to 8191)" << std::endl;
+      std::cout << "   -p <pretriggerlength>  set length of data recorded pre trigger" << std::endl;
       std::cout << "   -l <tracelength>       set total length of single trace" << std::endl;
       std::cout << "                          (includes <pretriggerlength>)" << std::endl;
       std::cout << "   -o <outputmethod>      set output method, details below" << std::endl;
       std::cout << "   -r <min> <max> <s> <e> Rejection parameters for integration (see below)" << std::endl;
-      std::cout << "   -s <min> <max> <s> <e> <tilt> Rejection parameters for improved rej/integ (see below)" << std::endl;
+      //std::cout << "   -s <min> <max> <s> <e> <tilt> Rejection parameters for improved rej/integ (see below)" << std::endl;
       std::cout << "   -c                     acquire 100 traces for calibration" << std::endl;
       std::cout << "   -a <offset>            offset (in bins) for channel A" << std::endl;
       std::cout << "   -b <offset>            offset (in bins) for channel B" << std::endl;
@@ -63,8 +62,8 @@ void usage() {
       std::cout << " " << TRIG_A_NEG_EDGE << "   Channel A, negative edge" << std::endl;
       std::cout << " " << TRIG_B_POS_EDGE << "   Channel B, positive edge" << std::endl;
       std::cout << " " << TRIG_B_NEG_EDGE << "   Channel B, negative edge" << std::endl;
-      std::cout << " " << TRIG_EXTERNAL_0 << "   External trigger, port 0" << std::endl;
-      std::cout << " " << TRIG_EXTERNAL_1 << "   External trigger, port 1" << std::endl;
+      //std::cout << " " << TRIG_EXTERNAL_0 << "   External trigger, port 0" << std::endl;
+      //std::cout << " " << TRIG_EXTERNAL_1 << "   External trigger, port 1" << std::endl;
       std::cout << std::endl;
       std::cout << "Output methods:" << std::endl;
       std::cout << " " << WRITE_OFF_ASCII_SINGLE << "   Ascii file, write every data point separately" << std::endl;
@@ -72,8 +71,12 @@ void usage() {
       std::cout << " " << WRITE_OFF_ASCII_INTEGRAL << "   Ascii file, write integral over peak, baseline substracted, simple double rejection" << std::endl;
       std::cout << " " << WRITE_OFF_JUST_CHECK << "   No output, just some information on measured data (recommended use with -n)" << std::endl;
       std::cout << " " << std::endl;
-      std::cout << "Rejection Parameters" << std::endl;
-      
+      std::cout << "Rejection Parameters:" << std::endl;
+      std::cout << "With the -r <min> <max> <s> <e> option, will reject detected peaks if " << std::endl;
+      std::cout << "either one of the following conditions is true: " << std::endl;
+      std::cout << "integral < peak * <min>" << std::endl;
+      std::cout << "integral > peak * <max>" << std::endl;
+      std::cout << "Main peaks are searched for between channel <s> and <e>" << std::endl;
 }
 
 
@@ -81,8 +84,6 @@ int main(int argc, char **argv)
 {
   TriggeredAcquisition * ta = new TriggeredAcquisition();
   ta->SetVerboseLevel(1);
-  ta->Init();
-
   ta->SetTrigger(TRIG_IMMEDIATE);
   ta->SetWriteOff(WRITE_OFF_ASCII_SINGLE);
 
@@ -182,6 +183,7 @@ int main(int argc, char **argv)
   ta->SetTracelength(tracelength);
   ta->SetPretriggerlength(pretriggerlength);
 
+  ta->Init();
     
   float length = atof(argv[argc - 1]);
   if(counter) {
