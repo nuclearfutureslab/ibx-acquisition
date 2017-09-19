@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This tool was written as part of the "Information Barrier eXperimental" project ([Repository](https://github.com/nuclearfutureslab/ibx), [Description](https://nuclearfutures.princeton.edu/projects/ibx/). The [Red Pitaya](https://redpitaya.com/) is a signal processing device with fast capture capabilities. The hardware together with this software is used in the IBX to provide a Gamma Spectrometer.
+This tool was written as part of the "Information Barrier eXperimental" project ([Repository](https://github.com/nuclearfutureslab/ibx)), [Description](https://nuclearfutures.princeton.edu/projects/ibx/). The [Red Pitaya](https://redpitaya.com/) is a signal processing device with fast capture capabilities. The hardware together with this software is used in the IBX to provide a Gamma Spectrometer.
 
 The software makes use of the FPGA module oscilloscope that is shipped with the RedPitaya OS. It can be used for any triggered data acquisition task using a Red Pitaya. It was greatly inspired by [this project](https://github.com/Grozomah/trigger), thanks to Grozomah for that!
 
@@ -51,11 +51,11 @@ The line above will do the following:
 
 
 
-For more info refer to the `acquisition -h`
+For more info refer to the `acquisition -h`.
 
 ### Some notes on rejection algorithm
 
-A very simple rejection has been implemented (only for output type 4). For this output, the `-r <min> <max> <s> <e> option should be specified. For each trace, the code calculates the integral and finds a peak between channel <s> and <e>.
+A very simple rejection has been implemented (only for output type 4). For this output, the `-r <min> <max> <s> <e>` option should be specified. For each trace, the code calculates the integral and finds a peak between channel <s> and <e>.
 The code will reject detected traces if either one of the following conditions is true:
 - integral < peak * <min>
 - integral > peak * <max>
