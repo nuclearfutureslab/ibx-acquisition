@@ -55,8 +55,9 @@ For more info refer to the `acquisition -h`.
 
 ### Some notes on rejection algorithm
 
-A very simple rejection has been implemented (only for output type 4). For this output, the `-r <min> <max> <s> <e>` option should be specified. For each trace, the code calculates the integral and finds a peak between channel <s> and <e>.
+A very simple rejection has been implemented (only for output type 4). For this output, the `-r <min> <max> <s> <e>` option should be specified. For each trace, the code calculates the integral and finds a peak between channel `<s>` and `<e>`.
 The code will reject detected traces if either one of the following conditions is true:
 - integral < peak * <min>
 - integral > peak * <max>
 (or accept traces only if the negation of both is true together)
+
