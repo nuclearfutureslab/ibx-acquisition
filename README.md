@@ -42,7 +42,7 @@ acquisition -t 3 -v -150 -o 4 -p 32 -l 384 -r 90 110 30 200 -f best_measurement_
 
 The line above will do the following:
 - Trigger for Input on Channel A, negative edge (`-t 3`)
-- Trigger when input voltage is recorde in ADC channel below -150 (`-v -150`)
+- Trigger when input voltage is recorded in ADC channel below -150 (`-v -150`)
 - Use output mode 4 (`-o 4`), output mode 4 is specifically useful for gamma spectroscopy. It integrates the incoming signal, and stores only! the integral in the output file. A simple method is implemented to reject traces that would contain two or more gamma peaks. `-r 90 110 30 200` are the rejection settings. For more details see notes on rejections.
 - The output of each event will include 32 datapoints that were recorded before the trigger triggered `-p 32`
 - Each event will be output as a set of 384 datapoints `-l 384`
