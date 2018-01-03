@@ -56,7 +56,7 @@ void usage() {
       std::cout << "   -g                     Run PMT as counter (no traces are written)" << std::endl;
       std::cout << std::endl;
       std::cout << std::endl;
-      std::cout << "Trigerring methods:" << std::endl;
+      std::cout << "Triggering methods:" << std::endl;
       std::cout << " " << TRIG_IMMEDIATE << "   Immediate" << std::endl;
       std::cout << " " << TRIG_A_POS_EDGE << "   Channel A, positive edge" << std::endl;
       std::cout << " " << TRIG_A_NEG_EDGE << "   Channel A, negative edge" << std::endl;
